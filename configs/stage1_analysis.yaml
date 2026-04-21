@@ -1,0 +1,21 @@
+# Stage 1: Layer Importance Analysis
+# Reference: moshilite_project_plan_v8.md, Stage 1
+
+precision_validation:
+  n_calibration_samples: 500
+  n_single_speaker: 250
+  n_dialogue: 250
+  thresholds:
+    spearman_rho: 0.95
+    cosine_drift: 0.05
+    kl_divergence: 0.1
+
+dual_stream_criticality:
+  n_single_examples: 200
+  n_dialogue_examples: 200
+  dsr_thresholds:
+    dual_stream_critical_dsr: 2.0
+    dual_stream_critical_bi_top_pct: 0.20
+    dialogue_critical_dsr: 1.5
+    dialogue_critical_bi_top_pct: 0.30
+  fallback_critical_pct: 0.70  # if >70% tagged critical, fall back to pure BI

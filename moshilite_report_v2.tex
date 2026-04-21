@@ -1,0 +1,307 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{amsmath}
+\usepackage{setspace} % Added for the onehalfspace environment to compile
+
+\title{\vspace{4cm} \textbf{\Huge MoshiLite Distillation Report}}
+\author{\Large S M Ridwan Husain Rafi -- 223 1349 642 \\
+\Large Samin Al Azmain Ahmed -- 2311851042 \\
+\Large Md. Nazmul Hasan Sakib -- 2312407042}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{8cm}
+    {\Huge S M Ridwan Husain Rafi -- 223 1349 642 \par}
+    \vspace{0.5cm}
+    {\Huge Samin Al Azmain Ahmed -- 2311851042 \par}
+    \vspace{0.5cm}
+    {\Huge Md. Nazmul Hasan Sakib -- 2312407042 \par}
+    \vfill
+\end{titlepage}
+
+\newpage
+\begin{landscape}
+\section*{Training Summary \& Post-KD Results}
+
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Model Variant} & \textbf{text} & \textbf{audio\_cb0} & \textbf{text\_top5} & \textbf{audio\_cb0} \\
+ & \textbf{token\_acc} & \textbf{token\_acc} & \textbf{\_agree} & \textbf{\_top5\_agree} \\
+\midrule
+v1\_scattered\_nonuni\_L2 & 0.8249 & 0.2506 & 0.9088 & 0.5484 \\
+v1\_scattered\_uni\_L2 & 0.8249 & 0.2506 & 0.9096 & 0.5484 \\
+v2a\_cont\_strict\_nonuni\_L2 & 0.8249 & 0.2506 & 0.9102 & 0.5045 \\
+v2a\_cont\_strict\_uni\_L2 & 0.8249 & 0.2534 & 0.9097 & 0.5662 \\
+v2b\_cont\_penalized\_nonuni\_L2 & 0.8249 & 0.2506 & 0.9105 & 0.5484 \\
+v2b\_cont\_penalized\_uni\_L2 & 0.8249 & 0.2506 & 0.9042 & 0.5611 \\
+v2c\_cont\_relaxed\_nonuni\_L2 & 0.8249 & 0.2506 & 0.9088 & 0.5045 \\
+v2c\_cont\_relaxed\_uni\_L2 & 0.8249 & 0.2507 & 0.9117 & 0.5687 \\
+v3\_collapse\_nonuni\_L2 & 0.8249 & 0.2599 & 0.9046 & 0.5602 \\
+v3\_collapse\_uni\_L2 & 0.8249 & 0.2507 & 0.9069 & 0.5666 \\
+\midrule
+magnitude\_30pct\_L2 & 0.9303 & 0.8242 & 0.9869 & 0.9725 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\newpage
+\subsection*{KL Divergence, Perplexity \& Validation Loss}
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Model Variant} & \textbf{text} & \textbf{audio\_cb0} & \textbf{text} & \textbf{audio\_cb0} & \textbf{val\_loss} \\
+ & \textbf{kl\_div} & \textbf{kl\_div} & \textbf{perp.} & \textbf{perp.} & \textbf{\_l2} \\
+\midrule
+v1\_scattered\_nonuni\_L2 & 0.0007 & 0.0005 & 3.81 & 58.17 & 1.6215 \\
+v1\_scattered\_uni\_L2 & 0.0007 & 0.0004 & 3.44 & 54.64 & 1.5720 \\
+v2a\_cont\_strict\_nonuni\_L2 & 0.0008 & 0.0004 & 3.15 & 55.66 & 1.5509 \\
+v2a\_cont\_strict\_uni\_L2 & 0.0006 & 0.0003 & 3.63 & 57.35 & 1.6018 \\
+v2b\_cont\_penalized\_nonuni\_L2 & 0.0007 & 0.0004 & 3.13 & 59.73 & 1.5701 \\
+v2b\_cont\_penalized\_uni\_L2 & 0.0005 & 0.0003 & 5.81 & 128.64 & 1.9855 \\
+v2c\_cont\_relaxed\_nonuni\_L2 & 0.0139 & 0.0219 & 3.38 & 61.94 & 1.6280 \\
+v2c\_cont\_relaxed\_uni\_L2 & 0.0005 & 0.0003 & 3.26 & 54.27 & 1.5533 \\
+v3\_collapse\_nonuni\_L2 & 0.0021 & 0.0005 & 3.58 & 50.03 & 1.5582 \\
+v3\_collapse\_uni\_L2 & 0.0006 & 0.0002 & 3.50 & 55.95 & 1.5837 \\
+\midrule
+magnitude\_30pct\_L2 & 0.0001 & 0.0006 & 1.30 & 1.83 & 0.2611 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\newpage
+\section*{Pre-KD vs Post-KD Distillation Comparison}
+
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l|rr|rr}
+\toprule
+\textbf{Model Variant} & \multicolumn{2}{p{3cm}|}{\centering\textbf{text\_top5}\\ \textbf{\_agree}} & \multicolumn{2}{p{3cm}}{\centering\textbf{audio\_cb0}\\ \textbf{\_top5\_agree}} \\
+& Pre & Post & Pre & Post \\
+\midrule
+v1\_scattered\_nonuni\_L2 & 0.0053 & 0.9088 & 0.0032 & 0.5484 \\
+v1\_scattered\_uni\_L2 & 0.0043 & 0.9096 & 0.0049 & 0.5484 \\
+v2a\_cont\_strict\_nonuni\_L2 & 0.0061 & 0.9102 & 0.0036 & 0.5045 \\
+v2a\_cont\_strict\_uni\_L2 & 0.0031 & 0.9097 & 0.0060 & 0.5662 \\
+v2b\_cont\_penalized\_nonuni\_L2 & 0.0061 & 0.9105 & 0.0036 & 0.5484 \\
+v2b\_cont\_penalized\_uni\_L2 & 0.0031 & 0.9042 & 0.0060 & 0.5611 \\
+v2c\_cont\_relaxed\_nonuni\_L2 & 0.0061 & 0.9088 & 0.0036 & 0.5045 \\
+v2c\_cont\_relaxed\_uni\_L2 & 0.0031 & 0.9117 & 0.0060 & 0.5687 \\
+v3\_collapse\_nonuni\_L2 & 0.0075 & 0.9046 & 0.0040 & 0.5602 \\
+v3\_collapse\_uni\_L2 & 0.0059 & 0.9069 & 0.0040 & 0.5666 \\
+\midrule
+magnitude\_30pct\_L2 & 0.9925 & 0.9869 & 0.9503 & 0.9725 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l|rr|rr}
+\toprule
+\textbf{Model Variant} & \multicolumn{2}{p{3cm}|}{\centering\textbf{text\_kl}\\ \textbf{\_div}} & \multicolumn{2}{p{3cm}}{\centering\textbf{audio\_cb0}\\ \textbf{\_kl\_div}} \\
+& Pre & Post & Pre & Post \\
+\midrule
+v1\_scattered\_nonuni\_L2 & 0.0322 & 0.0007 & 0.0843 & 0.0005 \\
+v1\_scattered\_uni\_L2 & 0.0226 & 0.0007 & 0.0821 & 0.0004 \\
+v2a\_cont\_strict\_nonuni\_L2 & 0.0328 & 0.0008 & 0.0845 & 0.0004 \\
+v2a\_cont\_strict\_uni\_L2 & 0.0231 & 0.0006 & 0.0831 & 0.0003 \\
+v2b\_cont\_penalized\_nonuni\_L2 & 0.0328 & 0.0007 & 0.0845 & 0.0004 \\
+v2b\_cont\_penalized\_uni\_L2 & 0.0231 & 0.0005 & 0.0831 & 0.0003 \\
+v2c\_cont\_relaxed\_nonuni\_L2 & 0.0328 & 0.0139 & 0.0845 & 0.0219 \\
+v2c\_cont\_relaxed\_uni\_L2 & 0.0231 & 0.0005 & 0.0831 & 0.0003 \\
+v3\_collapse\_nonuni\_L2 & 0.0306 & 0.0021 & 0.0864 & 0.0005 \\
+v3\_collapse\_uni\_L2 & 0.0228 & 0.0006 & 0.0832 & 0.0002 \\
+\midrule
+magnitude\_30pct\_L2 & 0.0068 & 0.0001 & 0.0869 & 0.0006 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\newpage
+
+\begin{table}[h!]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l|rr|rr|rr}
+\toprule
+\textbf{Model Variant} & \multicolumn{2}{p{2.5cm}|}{\centering\textbf{text}\\ \textbf{\_perplexity}} & \multicolumn{2}{p{2.5cm}|}{\centering\textbf{audio\_cb0}\\ \textbf{\_perplexity}} & \multicolumn{2}{p{2.5cm}}{\centering\textbf{val\_loss}\\ \textbf{\_l2}} \\
+& Pre & Post & Pre & Post & Pre & Post \\
+\midrule
+v1\_scattered\_nonuni\_L2 & 152063.2 & 3.81 & 12793.4 & 58.17 & 6.4982 & 1.6215 \\
+v1\_scattered\_uni\_L2 & 115073.1 & 3.44 & 14504.0 & 54.64 & 6.4439 & 1.5720 \\
+v2a\_cont\_strict\_nonuni\_L2 & 5870.8 & 3.15 & 7514.0 & 55.66 & 5.3628 & 1.5509 \\
+v2a\_cont\_strict\_uni\_L2 & 42785.6 & 3.63 & 41474.4 & 57.35 & 6.4634 & 1.6018 \\
+v2b\_cont\_penalized\_nonuni\_L2 & 5870.8 & 3.13 & 7514.0 & 59.73 & 5.3628 & 1.5701 \\
+v2b\_cont\_penalized\_uni\_L2 & 42785.6 & 5.81 & 41474.4 & 128.64 & 6.4634 & 1.9855 \\
+v2c\_cont\_relaxed\_nonuni\_L2 & 5870.8 & 3.38 & 7514.0 & 61.94 & 5.3628 & 1.6280 \\
+v2c\_cont\_relaxed\_uni\_L2 & 42785.6 & 3.26 & 41474.4 & 54.27 & 6.4634 & 1.5533 \\
+v3\_collapse\_nonuni\_L2 & 64946.9 & 3.58 & 9395.0 & 50.03 & 6.1507 & 1.5582 \\
+v3\_collapse\_uni\_L2 & 127345.1 & 3.50 & 244744.2 & 55.95 & 7.3230 & 1.5837 \\
+\midrule
+magnitude\_30pct\_L2 & 1.32 & 1.30 & 2.36 & 1.83 & 0.4054 & 0.2611 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\end{landscape}
+
+\newpage
+\section{Dataset Collection}
+
+The dataset for our knowledge distillation (KD) pipeline was synthetically generated via a self-play mechanism using a full-precision Moshi teacher model. 
+
+Moshi can talk to itself via two channels, where a channel's output from the $t - 1$ timestamp is used as another channel's input at the $t$ timestamp.
+
+The conversation sessions were initialized using random acoustic seeds comprising:
+\begin{itemize}
+    \item \textbf{Random noise vectors:} 80\%
+    \item \textbf{Naturalistic conversational cues:} 10\%
+    \item \textbf{Plain silence vectors:} 10\%
+\end{itemize}
+
+A 4-hour (375 steps at 12.5 Hz) audio corpus, containing 480 conversations of 30 seconds in length each, was generated. This process generally requires about 6--8 hours on an L4 GPU and 2--4 hours on an A100 GPU.
+
+During generation, different filters were applied to prevent degenerated audio.
+
+\subsection{Inner Monologue Filters}
+\begin{itemize}
+    \item \textbf{Length Check:} Rejects any conversation with fewer than 100 valid steps.
+    \item \textbf{Meaningful Text Repetition:} Rejects if more than 50\% of the 4-grams on non-PAD tokens are repeated.
+    \item \textbf{Second Half Repetition:} Addresses conversations that start normally but fall into an infinite loop in the second half. Rejects if more than 50\% of the 4-grams on non-PAD tokens from the final 15 seconds are repeated.
+    \item \textbf{All-Token Text Repetition:} Prevents over-generation of identical data. Rejects if more than 92\% of all 4-grams are repeated. (This includes PAD tokens; the threshold is kept high since all silence/empty talks mathematically count as repetition).
+\end{itemize}
+
+\subsection{Audio/Codebook 0 (CB0) Filters}
+We apply filters specifically to Codebook 0, as it contains the most important semantic and acoustic information.
+\begin{itemize}
+    \item \textbf{CB0 Repetition:} Removes acoustic loop generations. Rejects if more than 92\% of 4-grams in CB0 are repeated.
+    \item \textbf{Silence Collapse:} Rejects if more than 80\% of the CB0 outputs are silence tokens.
+\end{itemize}
+
+\section{What Was Saved?}
+
+\subsection{Hard Tokens (Exact decisions from the teacher model)}
+\begin{itemize}
+    \item \textbf{Channel A Audio Tokens:} This channel acted as the simulated ``user'' input to the teacher (Channel B). The audio produced by this channel is later used as input for the pruned student model.
+    \item \textbf{Text Tokens (Inner Monologue):} The final chosen text tokens outputted by the model (\texttt{int16}). These tokens act as the core textual ground truth of what the teacher actually ``wanted'' to say. (Note: Generating these tokens increased audio accuracy by 3x).
+    \item \textbf{Audio Tokens (8 Codebooks):} All 8 layers of audio RVQ codebook outputs.
+\end{itemize}
+
+\subsection{Sparse Logits (Probabilities behind decisions)}
+\begin{itemize}
+    \item \textbf{Text Logits (Top-50):} The teacher's probability distribution over the 32,000-word text vocabulary.
+    \item \textbf{Audio CB0 Logits (Top-50):} The teacher's probability distribution over the 2,048-token Codebook 0 vocabulary. (The remaining codebooks were excluded).
+\end{itemize}
+
+\section{Training}
+
+Moshi operates autoregressively. To predict the token for the $t^{th}$ timestamp, it feeds itself the user input plus all self-generated tokens up to the $t^{th}$ timestamp, and then predicts the token for the $(t + 1)^{th}$ timestamp. This process applies to both the inner monologue (text) and audio (Mimi RVQ).
+
+In offline distillation, fully tracking this process is prone to errors. We bypassed this bottleneck by utilizing teacher forcing and Helium's masked self-attention mechanism (causal masking).
+
+A 30-second user conversation (full Moshi Channel A outputs) is fed into the model. Due to causal masking, the student computes its prediction for the $T^{th}$ timestamp using only the user inputs and self-generated outputs from the $1, 2, 3, \dots, (T - 1)^{th}$ timestamps. Across all timestamps, predictions are calculated in parallel for all 375 steps.
+
+\section{Loss Formulation}
+
+\subsection{Step 1: The ``Soft'' Calculation (Sparse Logit KL-Divergence)}
+For every timestep $t$, the student compares its probability outputs to the teacher's top-50 probabilities.
+
+\begin{enumerate}
+    \item \textbf{Softening the Probabilities:} The teacher's top-K sparse raw logits ($V^{(T)}$) and the student's raw logits extracted at those exact same top-K indices ($V^{(S)}$) are smoothed using a Temperature scalar ($\tau = 3.0$) via the Softmax function.
+    \item \textbf{Measuring the Divergence:} The soft loss is calculated using KL-Divergence:
+    \[
+    \mathcal{L}_{logit} = D_{KL}({\mathrm{Teacher\_Logits}}_{t} \parallel {\mathrm{Student\_Logits}}_{t})
+    \]
+    \item \textbf{Aggregation:} This is calculated separately for the text vocabulary and the audio codebook vocabulary:
+    \[
+    \mathcal{L}_{soft\_total} = \mathcal{L}_{soft\_text} + \mathcal{L}_{soft\_audio}
+    \]
+\end{enumerate}
+
+This aggregate makes up \textbf{70\%} (weight factor $\alpha = 0.7$) of the total penalty.
+
+\subsection{Step 2: The ``Hard'' Calculation (Standard Cross-Entropy)}
+Simultaneously, the student looks at the exact single token the teacher chose for timestep $t$.
+
+Using the Cross-Entropy algorithm over the entire vocabulary space ($V$), it calculates the negative log-likelihood. The student is penalized purely based on whether it assigned the highest probability mass to the exact target token index chosen by the teacher:
+\[
+\mathcal{L}_{hard} = \text{CE}({\mathrm{Student\_Logits}}_{t}, {\mathrm{Teacher\_Chosen\_Token}}_{t})
+\]
+
+Like the soft loss, this is calculated for both text and audio tokens:
+\[
+\mathcal{L}_{hard\_total} = \mathcal{L}_{hard\_text} + \mathcal{L}_{hard\_audio}
+\]
+
+This operation is identical to standard large language model autoregressive training objectives. It makes up the remaining \textbf{30\%} (weight factor $\delta = 0.3$) of the total L2 penalty.
+
+Each variant is trained for \textbf{3 epochs}.
+
+\section{Evaluation Metrics}
+
+To assess the pruned student models across multiple facets during and post-KD, a mimicking-based evaluation topology is utilized. This relies on quantitative divergence and categorical alignment mappings to estimate exact distributional fidelity:
+
+\begin{itemize}
+    \item \textbf{Text and Audio Token Accuracy (\texttt{text\_token\_acc}, \texttt{audio\_cb0\_token\_acc}):} Measures traditional token generation accuracy---whether the highest probability scalar prediction inferred by the student network directly matches the exact unigram chosen by the teacher.
+    \begin{itemize}
+        \item \texttt{argmax(student\_text\_logits) == teacher\_text\_token} (averaged over valid timesteps)
+        \item \texttt{argmax(student\_audio\_logits) == teacher\_audio\_cb0\_token} (averaged over valid timesteps)
+    \end{itemize}
+
+    \item \textbf{Top-5 Agreement (\texttt{text\_top5\_agree}, \texttt{audio\_cb0\_top5\_agree}):} A relaxed intersection ratio measuring the overlap in the leading 5 vocabulary predictions. This dictates the student’s capability to retain the underlying contextual ambiguity within conversational audio flows as modeled by the teacher.
+    \begin{itemize}
+        \item Check if \texttt{teacher\_text\_token} $\in$ \texttt{top5(student\_text\_logits)} (averaged over valid timesteps)
+        \item Check if \texttt{teacher\_audio\_cb0} $\in$ \texttt{top5(student\_audio\_logits)} (averaged over valid timesteps)
+    \end{itemize}
+
+    \item \textbf{KL Divergence (\texttt{text\_kl\_div}, \texttt{audio\_cb0\_kl\_div}):} Scales the distance spanning both logit spaces to pinpoint and statistically verify overall entropy shifts throughout predictions in text modeling paths over temporal domains.
+    \begin{itemize}
+        \item \texttt{KL(teacher\_text\_probs} $\parallel$ \texttt{student\_text\_probs)} using sparse top-50 logits, temperature-scaled ($\tau^2$), averaged over valid timesteps.
+        \item \texttt{KL(teacher\_CB0\_probs} $\parallel$ \texttt{student\_CB0\_probs)} using sparse top-50 logits, temperature-scaled ($\tau^2$), averaged over valid timesteps.
+    \end{itemize}
+
+    \item \textbf{Perplexity (\texttt{text\_perplexity}, \texttt{audio\_cb0\_perplexity}):} Exponentiated entropy scores monitoring global predictive uncertainties. Drastic reductions seen in pre-KD and post-KD metrics act as fundamental verification logic demonstrating recovered linguistic representations.
+    \begin{itemize}
+        \item $\exp(\text{mean}(\text{CE}(\text{student\_text\_logits, teacher\_text\_token})))$ over valid timesteps. Capped at $\exp(20) \approx 485\text{M}$ to prevent overflow.
+        \item $\exp(\text{mean}(\text{CE}(\text{student\_CB0\_logits, teacher\_CB0\_token})))$ over valid timesteps. Capped at $\exp(20) \approx 485\text{M}$ to prevent overflow.
+    \end{itemize}
+
+    \item \textbf{Validation Loss:} The primary comparative magnitude tracking structural proximity over offline target optimization. It scales directly with the KD training loss gradients to guide parametric optimizations stably.
+    \begin{itemize}
+        \item $\alpha \cdot \mathcal{L}_{\text{logit}}(\text{text} + \text{audio}) + \delta \cdot \mathcal{L}_{\text{hard}}(\text{text} + \text{audio})$ (with default weights $\alpha=0.7$, $\delta=0.3$)
+    \end{itemize}
+\end{itemize}
+
+\begin{onehalfspace}
+\section{Next To Do}
+\begin{itemize}
+    \item Since magnitude pruning generates the best outputs, we can different algorithms with different sparsity for it: global/iterative at 35%, 40%, 45%, 50%, 55%.
+
+    \item 65\% of the layers were frozen during training of the structured pruned models. Therefore, more ca n be pruned from the versions. Test further sparsity.
+    
+    \item Use 2 moshi to generate better data for training/calibration instead of self-play. Each conversation should be at least 5 minutes long. Introduce filters to filter out degenerated/repeated/unusable audio.
+    
+    \item Explore other unstructured pruning algorithms (e.g., weight-based, magnitude-based, Wanda).
+    \item \textbf{Top K:} Use top k = 500 or 1k instead of 50.
+\end{itemize}
+\end{onehalfspace}
+
+\end{document}

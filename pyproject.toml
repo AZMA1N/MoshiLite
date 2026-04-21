@@ -1,0 +1,33 @@
+[project]
+name = "moshilite"
+version = "0.1.0"
+description = "Compressing Moshi to a sub-3B speech-to-speech model"
+requires-python = ">=3.10"
+dependencies = [
+    "moshi",
+    "transformers>=4.36",
+    "huggingface-hub",
+    "safetensors",
+    "bitsandbytes",
+    "peft",
+    "wandb",
+    "webdataset",
+    "jiwer",
+    "pyyaml",
+    "tqdm",
+    "scikit-learn",
+    "soundfile",
+    "bert-score",
+    "openai-whisper",
+    "datasets>=2.14.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

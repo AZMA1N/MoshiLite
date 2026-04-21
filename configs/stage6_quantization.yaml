@@ -1,0 +1,25 @@
+# Stage 6: Quantization & Export
+# Reference: moshilite_project_plan_v8.md, Stage 6
+
+quantization:
+  methods:
+    - name: int8_bitsandbytes
+      precision: int8
+      library: bitsandbytes
+    - name: int4_gptq
+      precision: int4
+      library: auto-gptq
+    - name: int4_awq
+      precision: int4
+      library: autoawq
+    - name: gguf
+      precision: int4
+      library: llama-cpp-python
+
+  calibration:
+    dataset: librispeech_dev_clean
+    n_samples: 128
+
+  eval_thresholds:
+    codebook_1_3_pesq_delta: 0.3   # max acceptable drop from baseline
+    full_codebook_pesq_delta: 0.5  # max acceptable drop from baseline

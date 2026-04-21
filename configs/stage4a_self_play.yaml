@@ -1,0 +1,41 @@
+# Stage 4a: Self-Play Data Generation (v10)
+# Target: 4 hours of audio data for proof-of-concept distillation
+
+generation:
+  # Corpus target
+  target_hours: 4.0
+  conversations_needed: 480           # 4 hrs / 30s = 480
+  steps_per_conversation: 375         # 30 seconds @ 12.5 Hz
+
+  # Seed diversity
+  seed_types: ["noise", "acoustic", "silence"]
+  seed_type_weights: [0.5, 0.3, 0.2]
+
+  # Sampling
+  temperature: 0.8
+  temperature_text: 0.7
+  top_k: 250                          # sampling top-k
+  top_k_text: 25                      # text sampling top-k
+  top_k_logits_capture: 50            # sparse logits to save
+
+  # Model
+  dtype: float16                      # float16 for T4/L4, bfloat16 for A100
+  # On A100 (40GB VRAM), FP16 teacher (~15.4 GB) fits comfortably
+
+quality_filter:
+  min_steps: 100                      # reject conversations < 8 seconds
+  max_repetition: 0.50                # max text 4-gram repetition ratio
+  max_silence: 0.80                   # max silence ratio on audio CB0
+
+storage:
+  output_dir: /content/drive/MyDrive/moshilite/self_play_data/conversations
+  # Per-conversation: ~316 KB without hidden states
+  # 480 conversations ≈ ~150 MB total (very small)
+
+session_planning:
+  # A100: ~35ms/step → 375 steps × 35ms = ~13s/conv → 480 × 13s ≈ 1.75 hrs
+  # L4:   ~100ms/step → 375 steps × 100ms = ~37.5s/conv → 480 × 37.5s ≈ 5 hrs
+  # T4:   ~200ms/step → 375 steps × 200ms = ~75s/conv → 480 × 75s ≈ 10 hrs
+  estimated_time_a100_hours: 2.0
+  estimated_time_l4_hours: 5.5
+  estimated_time_t4_hours: 11.0

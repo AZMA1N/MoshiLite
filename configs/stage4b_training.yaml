@@ -1,0 +1,53 @@
+# Stage 4b: Student KD Training (v10 — Self-Play Distillation)
+# Proof-of-concept: 4 hours of self-play data, L2 loss, 25 epochs
+
+training:
+  # Loss config: L2 (logit KD + hard label)
+  loss_config: L2
+  temperature: 3.0            # KD temperature τ
+  alpha: 0.7                  # logit KD weight
+  delta: 0.3                  # hard label weight
+  # β and γ are 0 for L2 (no hidden states, no codebook-specific loss)
+
+  # Optimization
+  learning_rate: 1.0e-4
+  warmup_steps: 50            # small corpus → short warmup
+  scheduler: cosine
+  optimizer: adamw_8bit       # bitsandbytes
+  batch_size: 4
+  gradient_accumulation: 4    # effective batch = 16 samples
+  mixed_precision: fp16       # T4-compatible; use bf16 on A100/L4
+  gradient_checkpointing: true
+
+  # Training budget (proof-of-concept, 4 hours corpus)
+  num_epochs: 25
+  # 4 hrs @ 12.5 Hz = 180K timesteps
+  # 16 samples/step × 375 steps/sample = 6000 timesteps/step
+  # Steps per epoch = 180K / 6K = 30
+  # Total: 30 × 25 = 750 steps
+  estimated_total_steps: 750
+
+  # Checkpointing (every 200 steps ≈ 6-7 epochs)
+  checkpoint_interval: 200    # steps
+  val_eval_interval: 100      # steps (every ~3 epochs)
+
+  # Early stopping (relaxed for PoC)
+  early_stopping_patience: 5  # eval cycles
+
+# Data
+data:
+  data_dir: /content/drive/MyDrive/moshilite/self_play_data/conversations
+  val_fraction: 0.1           # 10% held out for validation
+  max_steps_per_sample: null  # use full conversations
+
+# Student model
+student:
+  # Load from pruned variant checkpoint (best from Stage 2)
+  checkpoint: /content/drive/MyDrive/moshilite/models/pruned_variants/best_variant.pt
+  # Student has ~3.2-3.5B params after 30% pruning
+
+# Output
+output:
+  checkpoint_dir: /content/drive/MyDrive/moshilite/checkpoints/kd_poc_v1
+  wandb_project: moshilite
+  wandb_run_name: kd_poc_4hr_L2_25ep

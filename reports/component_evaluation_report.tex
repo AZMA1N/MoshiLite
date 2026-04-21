@@ -1,0 +1,676 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{titlesec}
+
+% ── Colors ────────────────────────────────────────────────────────────────────
+\definecolor{headerblue}{HTML}{1A3A5C}
+\definecolor{lightgray}{HTML}{F5F5F5}
+\definecolor{accentblue}{HTML}{2E86C1}
+\definecolor{warnred}{HTML}{C0392B}
+\definecolor{goodgreen}{HTML}{27AE60}
+\definecolor{neutralgray}{HTML}{7F8C8D}
+
+% ── Header / Footer ──────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{headerblue}{\textbf{MoshiLite} — Component Evaluation Report}}
+\fancyhead[R]{\small\textcolor{neutralgray}{\today}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Section styling ──────────────────────────────────────────────────────────
+\titleformat{\section}{\Large\bfseries\color{headerblue}}{}{0em}{}[\vspace{-0.4em}\textcolor{accentblue}{\rule{\textwidth}{0.6pt}}]
+\titleformat{\subsection}{\large\bfseries\color{headerblue}}{}{0em}{}
+
+% ── Helpers ───────────────────────────────────────────────────────────────────
+\newcommand{\metricbox}[2]{%
+  \noindent\textbf{\textcolor{accentblue}{#1}}\\[2pt]#2\par\medskip
+}
+
+\newcommand{\scoreval}[1]{\texttt{#1}}
+\newcommand{\good}[1]{\textcolor{goodgreen}{\textbf{#1}}}
+\newcommand{\bad}[1]{\textcolor{warnred}{\textbf{#1}}}
+\newcommand{\neutral}[1]{\textcolor{neutralgray}{#1}}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ── Title ─────────────────────────────────────────────────────────────────────
+\begin{center}
+  {\Huge\bfseries\textcolor{headerblue}{MoshiLite}}\\[6pt]
+  {\Large Component-Level Evaluation Report}\\[4pt]
+  {\large\textcolor{neutralgray}{Structured Pruning Ablation Study — All Variants}}\\[10pt]
+  {\normalsize\today}
+\end{center}
+\vspace{1em}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 1 — Summary Table & Metric Definitions
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Full Evaluation Summary}
+
+Table~\ref{tab:full} presents the complete component-level evaluation across the unpruned baseline and all ten pruned variants produced by the structured pruning ablation study.
+
+\begin{table}[H]
+\centering
+\caption{Component-level evaluation scores for all variants.}
+\label{tab:full}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r r r r r r r r}
+\toprule
+\textbf{Variant} & \textbf{Params (B)} & \textbf{PESQ} & \textbf{STOI} & \textbf{SNR (dB)} & \textbf{EM} & \textbf{F1} & \textbf{WER} & \textbf{RTF} & \textbf{TextAgree} & \textbf{HiddenCos} & \textbf{CB\_Acc} \\
+\midrule
+\rowcolor{lightgray}
+baseline                   & 7.688 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0772 & 0.9608 & 2.216 & $-$1.0000 & $-$1.0000 & $-$1.0 \\
+v1\_scattered\_nonuni      & 4.803 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0136 & 1.1687 & 2.856 & 0.0145  & 0.0003  & 0.0 \\
+\rowcolor{lightgray}
+v1\_scattered\_uni         & 4.823 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0160 & 1.4750 & 2.831 & 0.0072  & $-$0.0112 & 0.0 \\
+v2a\_cont\_strict\_nonuni  & 4.803 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0385 & 1.1447 & 2.827 & 0.0000  & 0.0321  & 0.0 \\
+\rowcolor{lightgray}
+v2a\_cont\_strict\_uni     & 4.823 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0000 & 1.0000 & 2.810 & 0.0072  & 0.0195  & 0.0 \\
+v2b\_cont\_penalized\_nonuni & 4.803 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0235 & 1.0250 & 2.819 & 0.0145  & 0.0306  & 0.0 \\
+\rowcolor{lightgray}
+v2b\_cont\_penalized\_uni  & 4.823 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0148 & 0.9969 & 2.792 & 0.0072  & 0.0137  & 0.0 \\
+v2c\_cont\_relaxed\_nonuni & 4.803 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0074 & 0.9969 & 2.803 & 0.0145  & 0.0301  & 0.0 \\
+\rowcolor{lightgray}
+v2c\_cont\_relaxed\_uni    & 4.823 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0000 & 1.0000 & 2.829 & 0.0072  & 0.0126  & 0.0 \\
+v3\_collapse\_nonuni       & 4.803 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0118 & 0.9953 & 2.795 & 0.0072  & $-$0.0258 & 0.0 \\
+\rowcolor{lightgray}
+v3\_collapse\_uni          & 4.823 & 1.938 & 0.9047 & $-$0.55 & 0.0 & 0.0855 & 1.6261 & 2.818 & 0.0072  & $-$0.0099 & 0.0 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Variant Definitions}
+
+\begin{itemize}[leftmargin=1.5em, itemsep=2pt]
+  \item \textbf{baseline} — Original unpruned Moshi model (7.69\,B parameters), used as the reference for all comparisons.
+  \item \textbf{v1\_scattered\_nonuni} — Non-contiguous (scattered) depth pruning with importance-guided non-uniform width reduction.
+  \item \textbf{v1\_scattered\_uni} — Non-contiguous (scattered) depth pruning with uniform width reduction across all retained layers.
+  \item \textbf{v2a\_cont\_strict\_nonuni} — Strictly contiguous block depth pruning with importance-guided non-uniform width reduction.
+  \item \textbf{v2a\_cont\_strict\_uni} — Strictly contiguous block depth pruning with uniform width reduction across all retained layers.
+  \item \textbf{v2b\_cont\_penalized\_nonuni} — Soft-contiguity-penalized depth pruning with importance-guided non-uniform width reduction.
+  \item \textbf{v2b\_cont\_penalized\_uni} — Soft-contiguity-penalized depth pruning with uniform width reduction across all retained layers.
+  \item \textbf{v2c\_cont\_relaxed\_nonuni} — Relaxed contiguity-constrained depth pruning with importance-guided non-uniform width reduction.
+  \item \textbf{v2c\_cont\_relaxed\_uni} — Relaxed contiguity-constrained depth pruning with uniform width reduction across all retained layers.
+  \item \textbf{v3\_collapse\_nonuni} — LaCo-style layer collapse (weight averaging of adjacent layers) with importance-guided non-uniform width reduction.
+  \item \textbf{v3\_collapse\_uni} — LaCo-style layer collapse (weight averaging of adjacent layers) with uniform width reduction across all retained layers.
+\end{itemize}
+
+\subsection{Metric Definitions}
+
+\metricbox{Params (B)}{Total number of model parameters in billions. Lower values indicate a more compact model.}
+
+\metricbox{PESQ — Perceptual Evaluation of Speech Quality}{An objective score (range $-0.5$ to $4.5$) that predicts the perceived audio quality of speech after processing. Higher is better. A score of $\sim$1.9 corresponds to \emph{poor} perceived quality.}
+
+\metricbox{STOI — Short-Time Objective Intelligibility}{Measures speech intelligibility on a scale of 0 to 1. Values above 0.9 indicate high intelligibility. Higher is better.}
+
+\metricbox{SNR (dB) — Signal-to-Noise Ratio}{The power ratio between the target signal and background noise, measured in decibels. Higher is better; negative values indicate that noise dominates the signal.}
+
+\metricbox{EM — Exact Match}{The fraction of generated text responses that exactly match the reference. Ranges from 0 to 1; higher is better.}
+
+\metricbox{F1}{Token-level F1 score between the generated and reference text. Ranges from 0 to 1; higher is better.}
+
+\metricbox{WER — Word Error Rate}{The fraction of word-level edit operations (insertions, deletions, substitutions) needed to transform the generated transcript into the reference. Lower is better; a WER $>1.0$ means the output contains more errors than reference words.}
+
+
+\metricbox{RTF — Real-Time Factor}{Wall-clock processing time divided by audio duration. An RTF $<1.0$ means faster-than-real-time; lower is better.}
+
+\metricbox{TextAgree — Text Agreement}{Cosine similarity between the text token distributions of the pruned model and the baseline. Higher values (closer to 1) indicate stronger agreement; 0 means no agreement; $-1.0$ means not computed.}
+
+\metricbox{HiddenCos — Hidden-State Cosine Similarity}{Average cosine similarity between the hidden-state representations of the pruned and baseline models, measured at corresponding transformer layers. Values near 1.0 indicate minimal representational drift; $-1.0$ means not computed.}
+
+\metricbox{CB\_Acc — Codebook Accuracy}{Fraction of audio codebook tokens that match between the pruned model and the baseline. Ranges from 0 to 1; higher is better; $-1.0$ means not computed.}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 2 — Baseline
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 1: Baseline (Unpruned)}
+
+\begin{table}[H]
+\centering
+\caption{Scores for the \textbf{baseline} (unpruned) model.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 7.688 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0772 \\
+WER           & 0.9608 \\
+
+RTF           & 2.216 \\
+TextAgree     & $-$1.0 \\
+HiddenCos     & $-$1.0 \\
+CB\_Acc       & $-$1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+The \textbf{baseline} model contains \textbf{7.688\,B parameters} and serves as the reference point against which all pruned variants are compared.
+
+\paragraph{Audio Quality.}
+PESQ is \scoreval{1.938}, which falls in the \emph{poor} quality band (below 2.0). STOI is \scoreval{0.905}, indicating that the generated speech retains high objective intelligibility despite its low perceptual quality. The negative SNR ($-$0.55\,dB) suggests that the generated waveform contains slightly more noise energy than signal energy, consistent with the low PESQ.
+
+\paragraph{Text Understanding.}
+Exact Match is \scoreval{0.0}: the model never produces an output that character-for-character matches the reference. Token-level F1 is only \scoreval{0.077}, indicating very weak lexical overlap. WER of \scoreval{0.961} is close to 1.0, meaning almost every reference word is either missing, substituted, or spuriously inserted. Together these metrics show that the baseline's text generation capability is already severely limited prior to any pruning.
+
+\paragraph{Baseline-Only Metrics.}
+TextAgree, HiddenCos, and CB\_Acc all report $-$1.0, indicating that these metrics are not applicable to the baseline (they measure agreement between a pruned variant and the baseline itself, and thus require a reference model).
+
+\paragraph{Latency.}
+RTF is \scoreval{2.216}, meaning the model takes roughly 2.2$\times$ longer than the audio duration to produce output. The model is \emph{not} real-time capable on the evaluation hardware.
+
+\paragraph{Summary.}
+The baseline establishes a performance floor: poor perceptual quality, near-random text accuracy, and above-real-time latency. Pruned variants are expected to trade a modest amount of additional quality for a large reduction in parameter count.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 3 — v1_scattered_nonuni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 2: v1\_scattered\_nonuni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v1\_scattered\_nonuni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.803 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0136 \\
+WER           & 1.1687 \\
+RTF           & 2.856 \\
+TextAgree     & 0.0145 \\
+HiddenCos     & 0.0003 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant applies \textbf{scattered (non-contiguous) depth pruning} with \textbf{non-uniform width pruning}, reducing the model from 7.69\,B to \textbf{4.80\,B parameters} — a 37.5\% reduction.
+
+\paragraph{Audio Quality.}
+PESQ, STOI, and SNR are \emph{identical} to the baseline (1.938, 0.905, $-$0.55\,dB), indicating that the audio encoder/decoder pathway was unaffected by pruning. The waveform-level output is unchanged.
+
+\paragraph{Text Understanding.}
+F1 drops sharply from 0.077 to \scoreval{0.014}, and WER rises to \scoreval{1.169} (above 1.0). The pruned model generates even less coherent text than the baseline; scattered layer removal has disrupted the text-generation pathway more than audio generation.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0145} and HiddenCos is nearly zero at \scoreval{0.0003}, confirming that the internal representations of this variant have diverged \emph{almost entirely} from the baseline. CB\_Acc of \scoreval{0.0} shows zero codebook token agreement. Scattered depth pruning has fundamentally altered the model's latent space.
+
+\paragraph{Latency.}
+Despite having fewer parameters, RTF \emph{increases} to \scoreval{2.856} (29\% slower than baseline). This is likely due to post-pruning memory layout inefficiencies or the non-uniform hidden dimensions introducing overhead in matrix operations.
+
+\paragraph{Summary.}
+This variant achieves the target parameter reduction but at a large cost: text quality degrades, latency worsens, and hidden-state alignment is negligible. Knowledge distillation will be essential to recover any useful behaviour.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 4 — v1_scattered_uni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 3: v1\_scattered\_uni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v1\_scattered\_uni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.823 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0160 \\
+WER           & 1.4750 \\
+RTF           & 2.831 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & $-$0.0112 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant applies \textbf{scattered depth pruning} with \textbf{uniform width pruning}, yielding \textbf{4.82\,B parameters} (37.3\% reduction).
+
+\paragraph{Audio Quality.}
+Audio metrics remain identical to the baseline. As with the non-uniform counterpart, the audio pipeline is unaffected by the pruning.
+
+\paragraph{Text Understanding.}
+F1 is marginally better than the non-uniform counterpart (\scoreval{0.016} vs.\ 0.014), but WER is \emph{significantly worse} at \scoreval{1.475} — the highest among all v1 variants. Uniform width pruning appears to distribute damage more evenly, causing slightly different (and worse) text degradation patterns.
+
+\paragraph{Alignment with Baseline.}
+TextAgree drops to \scoreval{0.0072} (half of the non-uniform variant). HiddenCos is slightly \emph{negative} at \scoreval{$-$0.011}, meaning the internal representations are worse than uncorrelated — they point in marginally opposing directions. CB\_Acc remains \scoreval{0.0}.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.831}, comparable to the non-uniform sibling and still approximately 28\% slower than the baseline.
+
+\paragraph{Summary.}
+Uniform width pruning under the scattered strategy performs slightly worse overall than non-uniform pruning, particularly on WER and hidden-state alignment. The uniform weight reduction appears to remove capacity more indiscriminately than the importance-guided non-uniform approach.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 5 — v2a_cont_strict_nonuni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 4: v2a\_cont\_strict\_nonuni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2a\_cont\_strict\_nonuni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.803 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0385 \\
+WER           & 1.1447 \\
+RTF           & 2.827 \\
+TextAgree     & 0.0000 \\
+HiddenCos     & 0.0321 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant applies \textbf{contiguous strict block depth pruning} with \textbf{non-uniform width pruning}, resulting in \textbf{4.80\,B parameters}.
+
+\paragraph{Audio Quality.}
+All three audio metrics (PESQ, STOI, SNR) remain identical to the baseline. Contiguous block removal does not affect the codec backbone.
+
+\paragraph{Text Understanding.}
+F1 is \scoreval{0.039}, the \textbf{second-highest among all pruned variants}, indicating that removing a contiguous block of low-importance layers preserves more textual coherence than scattered removal. WER is \scoreval{1.145}, which is lower (better) than both v1 variants.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is exactly \scoreval{0.0}, meaning text token distributions share zero overlap with the baseline — a seemingly contradictory finding given the higher F1. This suggests the model is producing \emph{different but partially correct} tokens. HiddenCos is \scoreval{0.032}, the \textbf{highest positive alignment} among all variants so far, indicating some preservation of internal representations.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.827}, essentially the same as the v1 variants.
+
+\paragraph{Summary.}
+Contiguous strict pruning with non-uniform width shows the best text metrics so far and the strongest hidden-state preservation. The contiguous removal strategy appears to disrupt inter-layer information flow less than scattering removed layers throughout the network.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 6 — v2a_cont_strict_uni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 5: v2a\_cont\_strict\_uni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2a\_cont\_strict\_uni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.823 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0000 \\
+WER           & 1.0000 \\
+RTF           & 2.810 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & 0.0195 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant applies \textbf{contiguous strict block depth pruning} with \textbf{uniform width pruning}, totalling \textbf{4.82\,B parameters}.
+
+\paragraph{Audio Quality.}
+Audio metrics are once again identical to the baseline. The codec pathway is robust to this pruning configuration.
+
+\paragraph{Text Understanding.}
+F1 is exactly \scoreval{0.0} and WER is exactly \scoreval{1.0}. This combination is noteworthy: a WER of 1.0 means the number of edits exactly equals the number of reference words, while zero F1 means no token overlaps. The model appears to generate text of approximately the correct length, but with entirely wrong tokens — suggesting that the model's output distribution has shifted to a degenerate mode that still produces plausible-length sequences.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0072} and HiddenCos is \scoreval{0.020} — both near zero but positive. Uniform width pruning preserves slightly less hidden-state structure than the non-uniform counterpart (0.020 vs.\ 0.032).
+
+\paragraph{Latency.}
+RTF is \scoreval{2.810}, marginally the fastest pruned variant so far, likely because uniform dimensions allow more efficient GPU kernel dispatch.
+
+\paragraph{Summary.}
+Uniform pruning under the contiguous strict strategy leads to complete text collapse (zero F1), while the non-uniform sibling retains some lexical accuracy. This reinforces the finding that importance-guided non-uniform width allocation is superior to blanket uniform reduction.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 7 — v2b_cont_penalized_nonuni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 6: v2b\_cont\_penalized\_nonuni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2b\_cont\_penalized\_nonuni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.803 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0235 \\
+WER           & 1.0250 \\
+RTF           & 2.819 \\
+TextAgree     & 0.0145 \\
+HiddenCos     & 0.0306 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{contiguous penalized block depth pruning} with \textbf{non-uniform width pruning}, at \textbf{4.80\,B parameters}. The ``penalized'' strategy applies a softer contiguity constraint that penalizes but does not strictly enforce consecutiveness of removed layers.
+
+\paragraph{Audio Quality.}
+Audio metrics are identical to the baseline — the pattern is consistent across all variants.
+
+\paragraph{Text Understanding.}
+F1 is \scoreval{0.024}, approximately half of the contiguous strict non-uniform variant. WER is \scoreval{1.025}, slightly above 1.0. The penalized contiguity strategy appears less effective than the strict contiguous approach for preserving text capability.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0145} (tied for the highest among all pruned variants) and HiddenCos is \scoreval{0.031}, nearly matching the best alignment observed in v2a\_cont\_strict\_nonuni. The penalized strategy preserves internal representations comparably well, even though text output quality is lower.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.819}, in the same narrow band as the other pruned variants.
+
+\paragraph{Summary.}
+The penalized contiguity approach offers a reasonable middle ground: alignment metrics are strong, but text quality is modest. The results suggest that the soft contiguity penalty may select a slightly suboptimal set of layers compared to the strict block strategy.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 8 — v2b_cont_penalized_uni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 7: v2b\_cont\_penalized\_uni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2b\_cont\_penalized\_uni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.823 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0148 \\
+WER           & 0.9969 \\
+RTF           & 2.792 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & 0.0137 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{contiguous penalized depth pruning} with \textbf{uniform width pruning}, at \textbf{4.82\,B parameters}.
+
+\paragraph{Audio Quality.}
+Identical to baseline across all three audio metrics.
+
+\paragraph{Text Understanding.}
+F1 is \scoreval{0.015} and WER is \scoreval{0.997} — the \textbf{lowest WER among all pruned variants} and even marginally better than the baseline (0.961 notwithstanding, WER $<$1.0 is noteworthy). However, the low F1 still indicates very weak token overlap with the reference. The model's edits are slightly fewer than the reference word count, suggesting it generates output very close in length but with mostly incorrect tokens.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0072} and HiddenCos is \scoreval{0.014} — both lower than the non-uniform counterpart, consistent with the pattern that uniform pruning degrades internal alignment.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.792}, the \textbf{fastest among all pruned variants}. The combination of uniform dimensions and penalized contiguity appears to yield the best throughput.
+
+\paragraph{Summary.}
+This variant has the best WER and fastest RTF of any pruned model, but its F1 and alignment metrics remain poor. It represents a latency-optimised operating point that may respond well to knowledge distillation.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 9 — v2c_cont_relaxed_nonuni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 8: v2c\_cont\_relaxed\_nonuni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2c\_cont\_relaxed\_nonuni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.803 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0074 \\
+WER           & 0.9969 \\
+RTF           & 2.803 \\
+TextAgree     & 0.0145 \\
+HiddenCos     & 0.0301 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{contiguous relaxed block depth pruning} with \textbf{non-uniform width pruning}, at \textbf{4.80\,B parameters}. The ``relaxed'' strategy imposes the loosest contiguity constraint of the three contiguous strategies.
+
+\paragraph{Audio Quality.}
+Identical to baseline — no change.
+
+\paragraph{Text Understanding.}
+F1 is only \scoreval{0.007}, among the lowest of all variants, but WER ties for the best pruned score at \scoreval{0.997}. This paradoxical combination — low F1 but low WER — implies the model produces outputs of approximately the right length with mostly incorrect tokens that require roughly one edit per reference word.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0145} (joint highest) and HiddenCos is \scoreval{0.030}, comparable to the best non-uniform variants. The relaxed contiguity constraint preserves hidden representations well, suggesting the selected layers are sensible even under a weaker structural constraint.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.803}, competitive and among the faster pruned variants.
+
+\paragraph{Summary.}
+The relaxed contiguous strategy matches the best alignment scores and WER but has notably lower F1 than the strict approach. The relaxed constraint may select layers that preserve structure but lose fine-grained lexical accuracy.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 10 — v2c_cont_relaxed_uni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 9: v2c\_cont\_relaxed\_uni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v2c\_cont\_relaxed\_uni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.823 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0000 \\
+WER           & 1.0000 \\
+RTF           & 2.829 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & 0.0126 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{contiguous relaxed depth pruning} with \textbf{uniform width pruning}, at \textbf{4.82\,B parameters}.
+
+\paragraph{Audio Quality.}
+Identical to baseline across all three audio metrics.
+
+\paragraph{Text Understanding.}
+F1 is exactly \scoreval{0.0} and WER is exactly \scoreval{1.0}, mirroring the degenerate behaviour observed in v2a\_cont\_strict\_uni. The model generates text of roughly correct length but with zero valid token overlap. This confirms a repeating pattern: \textbf{uniform width pruning under contiguous strategies tends to produce total text collapse}.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0072} and HiddenCos is \scoreval{0.013}, the lowest alignment of the contiguous non-uniform/uniform pairs. Relaxed contiguity combined with uniform pruning offers the weakest internal fidelity.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.829}, comparable to the other uniform variants.
+
+\paragraph{Summary.}
+This variant suffers from the same text collapse as the other uniform-pruned contiguous variants. Its weak alignment scores and zero F1 make it among the least promising candidates for knowledge distillation.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 11 — v3_collapse_nonuni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 10: v3\_collapse\_nonuni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v3\_collapse\_nonuni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.803 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0118 \\
+WER           & 0.9953 \\
+RTF           & 2.795 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & $-$0.0258 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{LaCo-style layer collapse} with \textbf{non-uniform width pruning}, at \textbf{4.80\,B parameters}. Layer collapse merges adjacent layers by averaging their weights rather than deleting them outright.
+
+\paragraph{Audio Quality.}
+Identical to the baseline — consistent with all other variants.
+
+\paragraph{Text Understanding.}
+F1 is \scoreval{0.012} and WER is \scoreval{0.995}, the \textbf{absolute lowest WER} among all entries including the baseline's 0.961 notwithstanding. The model produces outputs that are almost exactly one edit per reference word. However, F1 remains very low, indicating the correct tokens are rare.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0072}, and HiddenCos is \bad{$-$0.026} — the \textbf{most negative alignment} of any variant. Layer collapse has \emph{inverted} internal representations relative to the baseline. This is a critical finding: while layer collapse produces reasonable WER, the underlying representations are anti-correlated with the teacher, making standard feature-matching distillation potentially counterproductive.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.795}, the second fastest pruned variant. Layer collapse may allow more cache-friendly memory access than layer deletion.
+
+\paragraph{Summary.}
+Layer collapse achieves competitive WER and latency but causes the worst hidden-state misalignment of any strategy. Knowledge distillation for this variant should either avoid hidden-state matching losses or use an intermediate alignment step before fine-tuning.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  PAGE 12 — v3_collapse_uni
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Variant 11: v3\_collapse\_uni}
+
+\begin{table}[H]
+\centering
+\caption{Scores for \textbf{v3\_collapse\_uni}.}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Params (B)    & 4.823 \\
+PESQ          & 1.938 \\
+STOI          & 0.9047 \\
+SNR (dB)      & $-$0.55 \\
+EM            & 0.0 \\
+F1            & 0.0855 \\
+WER           & 1.6261 \\
+RTF           & 2.818 \\
+TextAgree     & 0.0072 \\
+HiddenCos     & $-$0.0099 \\
+CB\_Acc       & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+This variant uses \textbf{LaCo-style layer collapse} with \textbf{uniform width pruning}, at \textbf{4.82\,B parameters}.
+
+\paragraph{Audio Quality.}
+Identical to the baseline across PESQ, STOI, and SNR.
+
+\paragraph{Text Understanding.}
+F1 is \scoreval{0.086}, the \textbf{highest F1 of any variant} — even surpassing the baseline's 0.077. This is a striking result: the collapsed, uniformly-pruned model produces more token-level overlap with the reference than the full-size baseline. However, WER is \scoreval{1.626}, the \textbf{worst WER of any variant}, indicating that while some correct tokens appear, the model also generates a large volume of spurious insertions. The model is verbose but partially accurate.
+
+\paragraph{Alignment with Baseline.}
+TextAgree is \scoreval{0.0072} and HiddenCos is \scoreval{$-$0.010}, negative but less extreme than the non-uniform collapse variant. Layer collapse under uniform pruning still disrupts internal representations, but the disruption is milder.
+
+\paragraph{Latency.}
+RTF is \scoreval{2.818}, in line with the other pruned variants.
+
+\paragraph{Summary.}
+This is the most paradoxical variant: it achieves the best F1 but the worst WER, meaning it produces a flood of text that happens to contain more correct tokens. The high insertion rate makes it unsuitable for direct deployment, but the fact that it retains (and even improves) lexical overlap suggests that layer collapse with uniform pruning preserves the token vocabulary distribution better than other strategies. This variant is a strong candidate for knowledge distillation with a length-penalising loss.
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  CLOSING
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Concluding Remarks}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Audio quality is invariant to pruning.} All variants share identical PESQ, STOI, and SNR scores, confirming that the EnCodec-based audio encoder/decoder is unaffected by the transformer pruning applied in this study.
+  \item \textbf{Text quality degrades substantially.} Even the baseline exhibits near-random text performance (F1\,$\sim$\,0.08, WER\,$\sim$\,0.96). Pruning further degrades these metrics for most variants, with the notable exception of v3\_collapse\_uni, which achieves the highest F1 (0.086) at the cost of the highest WER (1.63).
+  \item \textbf{Non-uniform width pruning outperforms uniform pruning} across text quality and hidden-state alignment for nearly every depth strategy.
+  \item \textbf{Contiguous strict depth pruning with non-uniform width} (v2a\_cont\_strict\_nonuni) yields the best balance of F1, WER, and hidden-state preservation.
+  \item \textbf{Layer collapse} produces paradoxical results: excellent WER (non-uniform) or excellent F1 (uniform) but with the highest hidden-state misalignment.
+  \item \textbf{Knowledge distillation is essential.} No pruned variant is deployment-ready; all require fine-tuning. Hidden-state alignment metrics should guide the choice of distillation strategy.
+\end{itemize}
+
+\end{document}

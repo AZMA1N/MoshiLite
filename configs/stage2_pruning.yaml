@@ -1,0 +1,22 @@
+# Stage 2: Multi-Variant Structured Pruning
+# Reference: moshilite_project_plan_v9.md, Stage 2
+
+pruning:
+  max_layer_pct: 0.30
+  max_head_pct: 0.30
+  max_ffn_pct: 0.30
+  target_params_b: 3.5       # pre-quantization target
+
+depth:
+  mode: "scattered"           # scattered | contiguous | collapse
+  contiguous_penalty: 10.0    # penalty multiplier for critical layers in V2b
+  respect_critical: true      # V2a: skip blocks with critical layers
+
+width:
+  mode: "non_uniform"         # non_uniform | uniform
+  head_importance: "gradient" # gradient | activation (future)
+  ffn_importance: "pca"       # pca | activation (future)
+
+eval:
+  n_samples: 200              # calibration samples for quick eval
+  save_dir: "models/pruned_variants/"
